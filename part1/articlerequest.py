@@ -18,10 +18,8 @@ REQUEST_TIME = TWENTY_FIVE_MS * 5
 def nyt_request(offset):
     """Returns the url and payload for doc request from nytimes with starting
     at the offset"""
-    payload = {"source":"nyt",
-               "offset":"{0}".format(offset),
+    payload = {"offset":"{0}".format(offset),
                "api-key":API_KEY}
-    payload["begin_date"] = "20141004"
     url = "http://api.nytimes.com/svc/news/v3/content/nyt/all.json"
     return (url, payload)
 
@@ -66,11 +64,16 @@ def main():
     next_request_time = 0 # start right away
     offset = 0
     id_num = 0
-    logging.basicConfig(level=logging.WARNING)
-    while len(stored_records) < 50000:
+    logging.basicConfig(level=logging.DEBUG)
+    while len(stored_records) < 40:
         if time.time() > next_request_time:
             (url, payload) = nyt_request(offset)
             req = requests.get(url, params=payload)
+            logging.debug(r.status_code)
+            if r.status_code != requests.codes.ok:
+                logging.error("bad status code.  quitting")
+                return
+                
             response = req.json()
             (csv_records, stored_records) = handle_response(response,
                                                             stored_records)
@@ -86,3 +89,6 @@ def main():
         else:
             time.sleep(TWENTY_FIVE_MS)
 
+
+if __name__ == "__main__":
+    main()
