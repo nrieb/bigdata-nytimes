@@ -22,7 +22,7 @@ def nyt_request(offset):
     at the offset"""
     payload = {"offset":"{0}".format(offset),
                "api-key":API_KEY}
-    url = "http://api.nytimes.com/svc/news/v3/content/nyt/all.json"
+    url = "http://api.nytimes.com/svc/news/v3/content/nyt/all/.json"
     return (url, payload)
 
 #   section_request :: (URL, {String:String})
@@ -51,8 +51,9 @@ def main():
         if time.time() > next_request_time:
             (url, payload) = nyt_request(offset)
             req = requests.get(url, params=payload)
+<<<<<<< Updated upstream
             logging.debug(r.status_code)
-            if r.status_code != requests.codes.ok:
+            if req.status_code != requests.codes.ok:
                 retry_count += 0
                 if retry_count < RETRY_LIMIT:
                     logging.info("bad status code.  retrying")
@@ -64,6 +65,13 @@ def main():
                     return
             
             retry_count = 0
+=======
+            if req.status_code != requests.codes.ok:
+                logging.debug(req.status_code)
+                logging.debug(req.text)
+                logging.error("bad status code.  quitting")
+                return
+>>>>>>> Stashed changes
                 
             response = req.json()
             (csv_records, stored_records) = handle_response(response,
