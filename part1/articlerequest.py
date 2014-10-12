@@ -35,7 +35,27 @@ def section_request():
 # data StoredRecord = StoredRecord String String String
 StoredRecord = namedtuple("StoredRecord", ["title", "created_date", "url"])
 
-
+# handle_response :: {String:String} -> [StoredRecord]
+# -> (Maybe [String], [StoredRecord])
+def handle_response(response, stored_records):
+    """Handle the response from the nytimes request"""
+    storage = list(stored_records)
+    formatstr = "{abstract},{url}"
+    lines = []
+    if "error" in response or "results" not in response:
+        return (None, storage)
+    else:
+        for result in response["results"]:
+            record = StoredRecord(result["title"],
+                                  result["created_date"],
+                                  result["url"])
+            if record in storage:
+                continue
+            else:
+                storage.append(storage)
+                lines.append(formatstr.format(abstract=result["abstract"],
+                                              url=result["url"]))
+        return (lines, storage)
 
 #   main :: IO()
 def main():
@@ -51,7 +71,6 @@ def main():
         if time.time() > next_request_time:
             (url, payload) = nyt_request(offset)
             req = requests.get(url, params=payload)
-<<<<<<< Updated upstream
             logging.debug(r.status_code)
             if req.status_code != requests.codes.ok:
                 retry_count += 0
@@ -65,13 +84,6 @@ def main():
                     return
             
             retry_count = 0
-=======
-            if req.status_code != requests.codes.ok:
-                logging.debug(req.status_code)
-                logging.debug(req.text)
-                logging.error("bad status code.  quitting")
-                return
->>>>>>> Stashed changes
                 
             response = req.json()
             (csv_records, stored_records) = handle_response(response,
