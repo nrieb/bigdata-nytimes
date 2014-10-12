@@ -22,7 +22,7 @@ def nyt_request(offset):
     at the offset"""
     payload = {"offset":"{0}".format(offset),
                "api-key":API_KEY}
-    url = "http://api.nytimes.com/svc/news/v3/content/nyt/all/.json"
+    url = "http://api.nytimes.com/svc/news/v3/content/all/all/.json"
     return (url, payload)
 
 #   section_request :: (URL, {String:String})
@@ -35,12 +35,11 @@ def section_request():
 # data StoredRecord = StoredRecord String String String
 StoredRecord = namedtuple("StoredRecord", ["title", "created_date", "url"])
 
-# handle_response :: {String:String} -> [StoredRecord]
-# -> (Maybe [String], [StoredRecord])
+# handle_response :: JSON -> [StoredRecord]
+# -> (Maybe [JSON], [StoredRecord])
 def handle_response(response, stored_records):
     """Handle the response from the nytimes request"""
     storage = list(stored_records)
-    formatstr = "{abstract},{url}"
     lines = []
     if "error" in response or "results" not in response:
         return (None, storage)
@@ -52,9 +51,9 @@ def handle_response(response, stored_records):
             if record in storage:
                 continue
             else:
-                storage.append(storage)
-                lines.append(formatstr.format(abstract=result["abstract"],
-                                              url=result["url"]))
+                storage.append(record)
+                lines.append(result)
+
         return (lines, storage)
 
 #   main :: IO()
@@ -62,44 +61,51 @@ def main():
     """main program"""
     stored_records = []
     next_request_time = 0 # start right away
-    offset = 0
-    id_num = 0
+    article_offset = 0
     retry_count = 0
-    logging.basicConfig(level=logging.DEBUG)
-    
-    while len(stored_records) < 40:
+    logging.basicConfig(level=logging.INFO)
+
+    while len(stored_records) < 50000:
+
+        #Time for another request
         if time.time() > next_request_time:
-            (url, payload) = nyt_request(offset)
+            # make the request
+            (url, payload) = nyt_request(article_offset)
             req = requests.get(url, params=payload)
-            logging.debug(r.status_code)
+            logging.debug("request to {0}".format(req.url))
+            # handle server errors
             if req.status_code != requests.codes.ok:
                 retry_count += 0
                 if retry_count < RETRY_LIMIT:
-                    logging.info("bad status code.  retrying")
+                    logging.debug("bad status code.  retrying")
                     next_request_time = time.time() + RETRY_TIME
                     continue
                 else:
                     error_msg = "bad status code. more than {0} retrys. ending"
                     logging.info(error_msg.format(RETRY_LIMIT))
                     return
-            
+
+            # reset consecutive count
             retry_count = 0
-                
             response = req.json()
-            (csv_records, stored_records) = handle_response(response,
-                                                            stored_records)
-            if csv_records:
-                for line in csv_records:
-                    print("{0},{1}".format(id_num, line))
-                    id_num += 1
+            (json_records, stored_records) = handle_response(response,
+                                                             stored_records)
+
+            #print record
+            if json_records:
+                logging.debug("writing {0} records".format(len(json_records)))
+                for line in json_records:
+                    print(line)
             else:
                 logging.warning("got an error response")
-            # print
-            offset += 20 # each response should have 20 in it.
+
+            if len(stored_records) % 1000 == 0:
+                logging.info("Wrote {0} record".format(len(stored_records)))
+            article_offset += 20 # each response should have 20 in it.
             next_request_time = time.time() + REQUEST_TIME
         else:
             time.sleep(TWENTY_FIVE_MS)
 
-
+'''-------------------------------------------------------------------------'''
 if __name__ == "__main__":
     main()
