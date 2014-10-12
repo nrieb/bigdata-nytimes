@@ -11,7 +11,9 @@ API_KEY = "1e9766d00a2b163e1bcaacab404321bf:9:69917539"
 TWENTY_FIVE_MS = 25/1000.0
 CHECK_TIME = TWENTY_FIVE_MS
 REQUEST_TIME = TWENTY_FIVE_MS * 5
+RETRY_TIME = 1 #sec
 
+RETRY_LIMIT = 50
 
 # type URL = String
 #   nyt_request :: Int -> (URL, {String:String})
@@ -34,28 +36,6 @@ def section_request():
 StoredRecord = namedtuple("StoredRecord", ["title", "created_date", "url"])
 
 
-#   handle_response :: {String:String} -> [StoredRecord]
-#                       -> (Maybe [String], [StoredRecord])
-def handle_response(response, stored_records):
-    """Handle the response from the nytimes request"""
-    storage = list(stored_records)
-    formatstr = "{abstract},{url}"
-    lines = []
-    if "error" in response or "results" not in response:
-        return (None, storage)
-    else:
-        for result in response["results"]:
-            record = StoredRecord(result["title"],
-                                  result["created_date"],
-                                  result["url"])
-            if record in storage:
-                continue
-            else:
-                storage.append(storage)
-                lines.append(formatstr.format(abstract=result["abstract"],
-                                              url=result["url"]))
-        return (lines, storage)
-
 
 #   main :: IO()
 def main():
@@ -64,15 +44,26 @@ def main():
     next_request_time = 0 # start right away
     offset = 0
     id_num = 0
+    retry_count = 0
     logging.basicConfig(level=logging.DEBUG)
+    
     while len(stored_records) < 40:
         if time.time() > next_request_time:
             (url, payload) = nyt_request(offset)
             req = requests.get(url, params=payload)
             logging.debug(r.status_code)
             if r.status_code != requests.codes.ok:
-                logging.error("bad status code.  quitting")
-                return
+                retry_count += 0
+                if retry_count < RETRY_LIMIT:
+                    logging.info("bad status code.  retrying")
+                    next_request_time = time.time() + RETRY_TIME
+                    continue
+                else:
+                    error_msg = "bad status code. more than {0} retrys. ending"
+                    logging.info(error_msg.format(RETRY_LIMIT))
+                    return
+            
+            retry_count = 0
                 
             response = req.json()
             (csv_records, stored_records) = handle_response(response,
