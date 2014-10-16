@@ -5,6 +5,7 @@ import requests
 from collections import namedtuple
 import time
 import logging
+import json
 
 API_KEY = "1e9766d00a2b163e1bcaacab404321bf:9:69917539"
 # TWENTY_FIVE_MS :: Sec 1
@@ -63,6 +64,7 @@ def main():
     next_request_time = 0 # start right away
     article_offset = 0
     retry_count = 0
+    num = 0
     logging.basicConfig(level=logging.INFO)
 
     while len(stored_records) < 50000:
@@ -95,7 +97,9 @@ def main():
             if json_records:
                 logging.debug("writing {0} records".format(len(json_records)))
                 for line in json_records:
-                    print(line)
+                    line["id"] = hex(num)
+                    num += 1
+                    print(json.dumps(line))
             else:
                 logging.warning("got an error response")
 
