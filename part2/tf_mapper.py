@@ -3,6 +3,7 @@
 from __future__ import print_function
 import sys
 import json
+from stemming.porter2 import stem
 
 #http://www.textfixer.com/resources/common-english-words.txt
 # COMMON_ENGLISH :: [String]
@@ -12,26 +13,29 @@ COMMON_ENGLISH = ["a", "able", "about", "across", "after", "all", "almost", "als
 def abstract_words(abstract):
     """Get each word in the abstract, making chars lower case, removing
     non-alphabetic chars and spaces."""
-    allowable_chars = "abcdefghijklmnopqrstuvwxyz "
+    allowable_chars = unicode("abcdefghijklmnopqrstuvwxyz ")
     trimmed = "".join([char for char in abstract.lower()
                        if char in allowable_chars])
     words = []
     for word in trimmed.split(" "):
-        if len(word) == 0 or word in COMMON_ENGLISH:
+        try:
+            stemmed_word = stem(word)
+        except ValueError:
+            stemmed_word = word
+        if len(word) <= 1 or stemmed_word in COMMON_ENGLISH:
             continue
         else:
-            words.append(word)
+            words.append(stemmed_word)
     return words
 
 
 def main():
     """main function"""
     for line in sys.stdin:
-        record = json.loads(line)
-        if "abstract" in record and "url" in record:
+        record = json.loads(line.strip())
+        if "abstract" in record and "id" in record:
             for word in abstract_words(record["abstract"]):
-                value = json.dumps({record["url"]:1}, separators=(',',':'))
-                print("{0},{1}".format(word, value))
+                print("{0},{1}\t1".format(word, record["id"]))
 
 
 """-------------------------------------------------------------------------"""
