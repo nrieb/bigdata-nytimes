@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""<"word", {url:1}> output from raw json"""
+""" word,id\t1 output from raw json"""
 from __future__ import print_function
 import sys
 import json
@@ -35,7 +35,7 @@ def main():
         record = json.loads(line.strip())
         if "abstract" in record and "id" in record:
             for word in abstract_words(record["abstract"]):
-                print("{0},{1}\t1".format(word, record["id"]))
+                print("{0},{1:x}\t1".format(word, int(record["id"], 16)))
 
 
 """-------------------------------------------------------------------------"""

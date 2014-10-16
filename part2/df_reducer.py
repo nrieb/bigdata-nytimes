@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-"""Takes [(term,url)] and gives back [(term,(url,tf-idf))]"""
+"""Takes word \t id,tf gives back word,id \t tf, df"""
 
 from __future__ import print_function
 import sys
 import json
+from math import log
+
+DOC_COUNT = 40000.0
 
 #   is_int :: String -> Bool
 def is_int(string):
@@ -14,34 +17,42 @@ def is_int(string):
         return False
     return True
 
-#   multiset_length :: [(String, Int)] -> Int
-def multiset_length(multiset):
-    length = 0
-    for (_, count) in 
+def idf(doc_freq):
+    """Calculate inverse document frequency"""
+    return log(DOC_COUNT/doc_freq, 10)
 
 #   main :: IO ()
 def main():
     """main processor"""
-    prev_url = None
-    prev_term = None
-    count = 0
-    multiset = []
-    terms = []
+    prev_word = None
+    doc_freq = 0
+    max_tf = 0
+    storage = []
+    format_str = "{word},{id}\t{tf},{df}"
     for line in sys.stdin:
-        term, url = line.split('\t', 1)
-        if (prev_term and prev_term != term) or (prev_url and prev_url != term):
-            multiset.append((url, count))
-            count = 0
-            prev_url = url
+        line = line.strip()
+        word, value = line.split('\t', 1)
 
-        if prev_term and prev_term != term:
-            terms.append((prev_term, multiset))
-            prev_term = term
-            multiset = []
-            prev_url = None
+        if prev_word and prev_word != word:
+            for ident, term_freq in storage:
+                print(format_str.format(word=prev_word,
+                                        id=ident,
+                                        tf=term_freq,
+                                        df=doc_freq))
+            doc_freq = 0
+            max_tf = 0
+            storage = []
 
-    
+        doc_freq += 1
+        storage.append(value.split(",", 1))
+        prev_word = word
 
+    if doc_freq and prev_word:
+        for ident, term_freq in storage:
+            print(format_str.format(word=prev_word,
+                                    id=ident,
+                                    tf=term_freq,
+                                    df=doc_freq))
 
 '''-------------------------------------------------------------------------'''
 if __name__ == "__main__":
