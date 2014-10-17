@@ -1,7 +1,7 @@
 #! /bin/bash
 
 HADOOP_HOME="/usr/local/hadoop"
-OUTPUT = "/users/nrieb/nytimes/tf"
+OUTPUT="/users/nrieb/nytimes/tf"
 
 echo "======================STARTING TERM FREQ MAP REDUCE==================="
 $HADOOP_HOME/bin/hadoop dfs -rm $OUTPUT/*

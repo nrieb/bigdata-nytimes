@@ -1,8 +1,8 @@
 #! /bin/bash
 
 HADOOP_HOME="/usr/local/hadoop"
-INPUT = "/users/nrieb/nytimes/tf"
-OUTPUT = "/users/nrieb/nytimes/df"
+INPUT="/users/nrieb/nytimes/tf"
+OUTPUT="/users/nrieb/nytimes/df"
 
 echo "======================STARTING DOC FREQ MAP REDUCE==================="
 $HADOOP_HOME/bin/hadoop dfs -rm $OUTPUT/*
