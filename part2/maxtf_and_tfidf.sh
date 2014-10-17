@@ -2,7 +2,7 @@
 
 HADOOP_HOME="/usr/local/hadoop"
 INPUT="/users/nrieb/nytimes/df"
-OUTPUT_PATH="/users/nrieb/nytimes/tfidf"
+OUTPUT="/users/nrieb/nytimes/tfidf"
 
 echo "======================STARTING MAXTF - TFIDF MAP REDUCE==================="
 $HADOOP_HOME/bin/hadoop dfs -rmr $OUTPUT
