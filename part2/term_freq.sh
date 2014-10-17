@@ -1,8 +1,10 @@
 #! /bin/bash
 
 HADOOP_HOME="/usr/local/hadoop"
-SCRIPT_PATH="~/bigdata-nytimes/part2"
+OUTPUT = "/users/nrieb/nytimes/tf"
 
+echo "======================STARTING TERM FREQ MAP REDUCE==================="
+$HADOOP_HOME/bin/hadoop dfs -rm $OUTPUT/*
 $HADOOP_HOME/bin/hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-*streaming*.jar \
     -file porter2.py \
     -file tf_mapper.py \
@@ -10,4 +12,4 @@ $HADOOP_HOME/bin/hadoop jar $HADOOP_HOME/contrib/streaming/hadoop-*streaming*.ja
     -file tf_reducer.py \
     -reducer tf_reducer.py \
     -input /users/nrieb/nytimes/orig/* \
-    -output /users/nrieb/nytimes/tf
+    -output $OUTPUT
