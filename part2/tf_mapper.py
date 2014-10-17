@@ -3,7 +3,7 @@
 from __future__ import print_function
 import sys
 import json
-from stemming.porter2 import stem
+from porter2 import stem
 
 #http://www.textfixer.com/resources/common-english-words.txt
 # COMMON_ENGLISH :: [String]

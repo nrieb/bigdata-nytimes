@@ -7,7 +7,7 @@ import json
 from math import log
 import logging
 
-DOC_COUNT = 40000.0
+DOC_COUNT = 40558.0
 
 #   is_int :: String -> Bool
 def is_int(string):
