@@ -13,9 +13,9 @@ def main():
         word, value = line.split("\t", 1)
         if prev_word and prev_word != word:
             for ident, tfidf in values:
-                print("{ident},{word},{word_id},{tfidf}".format(ident=ident,
+                print("{ident},{word},{word_id:x},{tfidf}".format(ident=ident,
                                                                 word=prev_word,
-                                                                word_id=hex(word_id),
+                                                                word_id=word_id,
                                                                 tfidf=tfidf))
             word_id += 1
             values = []
@@ -24,9 +24,9 @@ def main():
         prev_word = word
     if prev_word and len(values):
         for ident, tfidf in values:
-            print("{ident},{word},{word_id},{tfidf}".format(ident=ident,
+            print("{ident},{word},{word_id:x},{tfidf}".format(ident=ident,
                                                             word=prev_word,
-                                                            word_id=hex(word_id),
+                                                            word_id=word_id,
                                                             tfidf=tfidf))
 
 
