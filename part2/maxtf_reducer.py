@@ -51,7 +51,7 @@ def main():
         if is_int(term_freq):
             if int(term_freq) > max_tf:
                 max_tf = int(term_freq)
-            storage.append((word, int(term_freq), int(doc_freq)))
+            storage.append((word, float(term_freq), float(doc_freq)))
             prev_ident = ident
 
     if max_tf:

@@ -6,8 +6,6 @@ import sys
 import json
 from math import log
 
-DOC_COUNT = 40000.0
-
 #   is_int :: String -> Bool
 def is_int(string):
     """Determines if string is formed like int"""
@@ -17,16 +15,11 @@ def is_int(string):
         return False
     return True
 
-def idf(doc_freq):
-    """Calculate inverse document frequency"""
-    return log(DOC_COUNT/doc_freq, 10)
-
 #   main :: IO ()
 def main():
     """main processor"""
     prev_word = None
     doc_freq = 0
-    max_tf = 0
     storage = []
     format_str = "{word},{id}\t{tf},{df}"
     for line in sys.stdin:
@@ -40,7 +33,6 @@ def main():
                                         tf=term_freq,
                                         df=doc_freq))
             doc_freq = 0
-            max_tf = 0
             storage = []
 
         doc_freq += 1
