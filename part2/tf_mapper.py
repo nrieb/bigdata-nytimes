@@ -18,16 +18,13 @@ def abstract_words(abstract):
                        if char in allowable_chars])
     words = []
     for word in trimmed.split(" "):
-        if len(word) <= 1 or stemmed_word in COMMON_ENGLISH:
+        if len(word) <= 1 or word in COMMON_ENGLISH:
             continue
         try:
             stemmed_word = stem(word)
         except ValueError:
             stemmed_word = word
-        if len(word) <= 1 or stemmed_word in COMMON_ENGLISH:
-            continue
-        else:
-            words.append(stemmed_word)
+        words.append(stemmed_word)
     return words
 
 
