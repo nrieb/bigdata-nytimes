@@ -18,6 +18,8 @@ def abstract_words(abstract):
                        if char in allowable_chars])
     words = []
     for word in trimmed.split(" "):
+        if len(word) <= 1 or stemmed_word in COMMON_ENGLISH:
+            continue
         try:
             stemmed_word = stem(word)
         except ValueError:
