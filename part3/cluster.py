@@ -48,9 +48,25 @@ logging.info("rdim {0}, cdim {1}".format(rdim, cdim))
 #       the matrix a lot.
 S = lil_matrix((rdim, cdim))
 
+def normalize(s, rdim):
+    
+    for rowid in xrange(0, rdim):
+        row = s.getrowview(rowid)
+        _, colidx = row.nonzero()
+        sum = 0
+        for i in colidx:
+            sum += row[0, i]
+
+        _, colidx = row.nonzero()
+        
+        for i in coldix:
+            row[0,i] /= sum
+
 # add data to S
 for (i, j, d) in extract_nonzero("word_id.csv"):
     S[i, j] = d
+
+normalize(S, rdim)
 
 """
       1 Afternoon Update 
