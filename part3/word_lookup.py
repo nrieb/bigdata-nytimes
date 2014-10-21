@@ -12,7 +12,7 @@ def main():
                 if id == word_id:
                     print word, id
 """
-TOP_WORDS_FILE = "max_tf_idf.txt"
+TOP_WORDS_FILE = "max_count_per_cluster.txt"
 WORD_ID_FILE = "word_id.csv"
 
 def main():
@@ -33,15 +33,19 @@ def main():
             if line[0] == "=":
                 print(line)
                 continue
+            
+            if "," not in line:
+                total_count = float(line)
+                print(line)
+                continue
                 
             try:
-                word_id, tfidf = line.split(",", 1)
+                word_id, count = line.split(",", 1)
             except ValueError:
                 print(line,file=sys.stderr)
                 raise
             word_id = int(word_id, 16)
-            print("{word},{word_id:x},{tfidf}".format(word=words[word_id],
-                                                      word_id=word_id,
-                                                      tfidf=tfidf))
+            print("{word},{percent:.3%}".format(word=words[word_id],
+                                            percent=int(count)/total_count ))
     
 main()
