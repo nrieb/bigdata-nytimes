@@ -8,6 +8,7 @@ from sklearn.cluster import KMeans, SpectralClustering, MiniBatchKMeans
 import logging
 import sys
 import json
+import math
 
 def extract_nonzero(fname):
     """
@@ -47,6 +48,7 @@ logging.info("rdim {0}, cdim {1}".format(rdim, cdim))
 # note: lil_matrix is used since we be modifying
 #       the matrix a lot.
 S = lil_matrix((rdim, cdim))
+CP = lil_matrix((rdim, cdim))
 
 def normalize(s, rdim):
     
@@ -55,16 +57,19 @@ def normalize(s, rdim):
         _, colidx = row.nonzero()
         sum = 0
         for i in colidx:
-            sum += row[0, i]
+            sum += row[0, i]**2
 
         _, colidx = row.nonzero()
         
-        for i in coldix:
-            row[0,i] /= sum
+        for i in colidx:
+            row[0,i] /= math.sqrt(sum)
 
 # add data to S
 for (i, j, d) in extract_nonzero("word_id.csv"):
     S[i, j] = d
+
+for (i, j, d) in extract_nonzero("word_id.csv"):
+    CP[i, j] = d
 
 normalize(S, rdim)
 
@@ -192,7 +197,7 @@ x   1164 World Middle East
 """
 
 # perform clustering
-labeler = KMeans(n_clusters=6, max_iter=4000, n_init=20)
+labeler = KMeans(n_clusters=24)
 #labeler = MiniBatchKMeans(n_clusters=8)
 #labeler = SpectralClustering(n_clusters=8)
 # convert lil to csr format
@@ -204,10 +209,10 @@ labeler.fit(S.tocsr())
 # print cluster assignments for each row
 print "docid,label,wordid,tfidf"
 for (rowidx, label) in enumerate(labeler.labels_):
-    row = S.getrow(rowidx)
+    row = CP.getrow(rowidx)
     _ , colidxs = row.nonzero()
     for colidx in colidxs:
-        print "{docid},{label},{wordid},{tfidf}".format(docid=rowidx,
+        print "{docid:x},{label},{wordid:x},{tfidf}".format(docid=rowidx,
                                                         label=label,
                                                         wordid=colidx,
                                                         tfidf=row[0,colidx])
