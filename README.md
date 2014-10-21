@@ -1,6 +1,8 @@
 bigdata-nytimes
 ===============
 
+Author nrieb
+
 Challenge 1
 
 The goal is to cluster the abstracts of some articles from the New York Times newspaper.
