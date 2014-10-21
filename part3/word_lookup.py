@@ -17,6 +17,15 @@ def my_plot(words, percents, group):
     plt.savefig("group_{0}.png".format(group))
     #plt.show()
 
+def plot_cluster_sizes(sizes):
+    plt.clf()
+    plt.barh(range(len(sizes)), sizes, color='#000000', label="sizes")
+    plt.ylabel("Clusters")
+    plt.xlabel("# of documents")
+    plt.title("Cluster Sizes by Cluster")
+    plt.yticks(range(len(sizes)), range(len(sizes)))
+    plt.savefig("sizes.png")
+
 def get_id_to_words():
     words = []
     #word_id file sorted by word_id
@@ -35,6 +44,7 @@ def main():
     group = None
     curr_words = []
     percents = []
+    cluster_sizes = []
     with open(TOP_WORDS_FILE) as f:
         for line in f:
             line = line.strip()
@@ -51,6 +61,7 @@ def main():
             
             if "," not in line:
                 total_count = float(line)
+                cluster_sizes.append(total_count)
                 print(line)
                 continue
                 
@@ -69,5 +80,6 @@ def main():
 
     if len(curr_words) and len(percents):
         my_plot(curr_words, percents, group)
+    plot_cluster_sizes(cluster_sizes)
     
 main()
